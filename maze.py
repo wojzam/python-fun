@@ -8,8 +8,8 @@ PATH = "."
 START = "S"
 END = "E"
 
-HEIGHT, WIDTH = 59, 59
-CELL_SIZE = 10
+HEIGHT, WIDTH = 121, 121
+CELL_SIZE = 5
 WINDOW_HEIGHT = HEIGHT * CELL_SIZE
 WINDOW_WIDTH = WIDTH * CELL_SIZE
 
@@ -39,12 +39,27 @@ def random_directions():
     return directions
 
 
-def generate_maze_path(maze, x, y):
-    maze[x][y] = EMPTY
-    for dx, dy in random_directions():
-        if 1 <= x + 2 * dx < HEIGHT - 1 and 1 <= y + 2 * dy < WIDTH - 1 and maze[x + 2 * dx][y + 2 * dy] == WALL:
+def generate_maze_path(maze, start_x, start_y):
+    stack = [(start_x, start_y)]
+    maze[start_x][start_y] = EMPTY
+
+    while stack:
+        x, y = stack[-1]
+        neighbors = []
+
+        for dx, dy in random_directions():
+            new_x, new_y = x + 2 * dx, y + 2 * dy
+
+            if 1 <= new_x < HEIGHT - 1 and 1 <= new_y < WIDTH - 1 and maze[new_x][new_y] == WALL:
+                neighbors.append((new_x, new_y, dx, dy))
+
+        if neighbors:
+            new_x, new_y, dx, dy = random.choice(neighbors)
             maze[x + dx][y + dy] = EMPTY
-            generate_maze_path(maze, x + 2 * dx, y + 2 * dy)
+            maze[new_x][new_y] = EMPTY
+            stack.append((new_x, new_y))
+        else:
+            stack.pop()
 
 
 def find_path(maze, start_x, start_y):
